@@ -1,1 +1,3 @@
-%{"ok": {:hex, :ok, "1.6.2", "56dd875c79f6760f3ec8c5a7a2c94f27de1d31a1d4c66fc162557f056726d02b", [:mix], []}}
+%{
+  "ok": {:hex, :ok, "1.6.2", "56dd875c79f6760f3ec8c5a7a2c94f27de1d31a1d4c66fc162557f056726d02b", [:mix], [], "hexpm", "f7239a8e66d23f6aad6f6fa5047fa4776d4bf9031caa4069941810af42ad7f58"},
+}

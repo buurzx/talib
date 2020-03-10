@@ -32,15 +32,15 @@ defmodule Talib.SMATest do
 
     def numbers_sma_10 do
       [
-        nil,
-        nil,
-        nil,
-        nil,
-        nil,
-        nil,
-        nil,
-        nil,
-        nil,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         54.1,
         49.8,
         45.1,
@@ -68,14 +68,14 @@ defmodule Talib.SMATest do
              {:ok,
               %Talib.SMA{
                 period: 2,
-                values: [nil, nil, 82.0]
+                values: [0, 0, 82.0]
               }}
 
     assert SMA.from_list([3], 3) ==
              {:ok,
               %Talib.SMA{
                 period: 3,
-                values: [nil]
+                values: [0]
               }}
 
     assert SMA.from_list([], 1) === {:error, :no_data}
@@ -92,13 +92,13 @@ defmodule Talib.SMATest do
     assert SMA.from_list!([nil, 87, 77], 2) ==
              %Talib.SMA{
                period: 2,
-               values: [nil, nil, 82.0]
+               values: [0, 0, 82.0]
              }
 
     assert SMA.from_list!([3], 3) ==
              %Talib.SMA{
                period: 3,
-               values: [nil]
+               values: [0]
              }
 
     assert_raise NoDataError, fn -> SMA.from_list!([], 1) end

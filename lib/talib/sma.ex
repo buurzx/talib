@@ -34,7 +34,7 @@ defmodule Talib.SMA do
       iex> Talib.SMA.from_list([17, 23, 44], 2)
       {:ok, %Talib.SMA{
         period: 2,
-        values: [nil, 20.0, 33.5]
+        values: [0, 20.0, 33.5]
       }}
 
       iex> Talib.SMA.from_list([], 1)
@@ -54,10 +54,10 @@ defmodule Talib.SMA do
 
   ## Examples
 
-      iex> Talib.SMA.from_list!([17, 23, 44], 2)
+      iex> Talib.SMA.from_list!([9, 10, 11, 12, 13, 14], 5)
       %Talib.SMA{
-        period: 2,
-        values: [nil, 20.0, 33.5]
+        period: 5,
+        values: [0, 0, 0, 0, 11.0, 12.0]
       }
 
       iex> Talib.SMA.from_list!([], 1)
@@ -93,13 +93,13 @@ defmodule Talib.SMA do
   defp calculate([hd | tl] = data, period, results) do
     cond do
       length(results) < period - 1 && length(data) > length(results) ->
-        calculate(data, period, results ++ [nil])
+        calculate(data, period, results ++ [0])
 
       length(data) < period ->
         calculate(tl, period, results)
 
       hd === nil ->
-        calculate(tl, period, results ++ [nil])
+        calculate(tl, period, results ++ [0])
 
       length(data) >= period ->
         result =
@@ -108,7 +108,7 @@ defmodule Talib.SMA do
           |> Enum.sum()
           |> Kernel./(period)
 
-        calculate(tl, period, results ++ [result])
+        calculate(tl, period, results ++ [Float.round(result, 2)])
     end
   end
 end

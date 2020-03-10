@@ -1,6 +1,6 @@
 # TODO: Stochastic
 defmodule Talib.Indicator do
-  alias Talib.{EMA, SMMA}
+  alias Talib.SMMA
   alias Talib.Utility
 
   @moduledoc ~S"""

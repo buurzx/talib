@@ -6,7 +6,7 @@ defmodule Talib.Utility do
 
   @doc """
   Gets the change in the list.
-  
+
   The `direction` parameter is a direction filter, which defaults to 0.
   Returns `{:ok, change}`, otherwise `{:error, reason}`.
 
@@ -17,26 +17,26 @@ defmodule Talib.Utility do
   ## Examples
 
       iex> Talib.Utility.change([1, 2, -3])
-      {:ok, [nil, 1, -5]}
+      {:ok, [0, 1, -5]}
 
       iex> Talib.Utility.change([1, 2, -3], 1)
-      {:ok, [nil, 1, 0]}
+      {:ok, [0, 1, 0]}
 
       iex> Talib.Utility.change([1, 2, nil, -3], 0)
-      {:ok, [nil, 1, nil, nil]}
+      {:ok, [0, 1, 0, 0]}
 
       iex> Talib.Utility.change([1, 2, -3], -1)
-      {:ok, [nil, 0, 5]}
+      {:ok, [0, 0, 5]}
 
       iex> Talib.Utility.change([1], -1)
-      {:ok, [nil]}
+      {:ok, [0]}
 
       iex> Talib.Utility.change([], -1)
       {:error, :no_data}
 
   ## History
 
-  Version: 1.0  
+  Version: 1.0
   Audited by:
 
   | Name         | Title             |
@@ -47,21 +47,26 @@ defmodule Talib.Utility do
   @spec change([number], integer) :: {:ok, [number, ...]} | {:error, atom}
   def change(_data, direction \\ 0)
   def change([], _direction), do: {:error, :no_data}
+
   def change(data, direction) do
-    [_, result] = Enum.reduce(data, [nil, []], fn(element, [last_el, total]) ->
-      # Check differences between last element and current element
-      cond do
-        (element === nil or last_el === nil) ->
-          [element, total ++ [nil]]
-        ((direction === 1 and element - last_el > 0) or
-        (direction === -1 and element - last_el < 0)) ->
-          [element, total ++ [abs(element - last_el)]]
-        (direction === 0) ->
-          [element, total ++ [element - last_el]]
-        true ->
-          [element, total ++ [0]]
-      end
-    end)
+    [_, result] =
+      Enum.reduce(data, [nil, []], fn element, [last_el, total] ->
+        # Check differences between last element and current element
+        cond do
+          element === nil or last_el === nil ->
+            [element, total ++ [0]]
+
+          (direction === 1 and element > last_el) or
+              (direction === -1 and element < last_el) ->
+            [element, total ++ [abs(element - last_el)]]
+
+          direction === 0 ->
+            [element, total ++ [element - last_el]]
+
+          true ->
+            [element, total ++ [0]]
+        end
+      end)
 
     {:ok, result}
   end
@@ -76,17 +81,17 @@ defmodule Talib.Utility do
   ## Examples
 
       iex> Talib.Utility.gain([1, 2, -3])
-      {:ok, [nil, 1, 0]}
+      {:ok, [0, 1, 0]}
 
       iex> Talib.Utility.gain([1])
-      {:ok, [nil]}
+      {:ok, [0]}
 
       iex> Talib.Utility.gain([])
       {:error, :no_data}
 
   ## History
 
-  Version: 1.0  
+  Version: 1.0
   Audited by:
 
   | Name         | Title             |
@@ -121,7 +126,7 @@ defmodule Talib.Utility do
 
   ## History
 
-  Version: 1.0  
+  Version: 1.0
   Audited by:
 
   | Name         | Title             |
@@ -131,12 +136,16 @@ defmodule Talib.Utility do
   """
   @spec high([number]) :: {:ok, number} | {:error, atom}
   def high([]), do: {:error, :no_data}
+
   def high(data) do
     filtered_data = filter_nil(data)
-    highest = case filtered_data do
-      [] -> nil
-      [_ | _] -> Enum.max(filtered_data)
-    end
+
+    highest =
+      case filtered_data do
+        [] -> nil
+        [_ | _] -> Enum.max(filtered_data)
+      end
+
     {:ok, highest}
   end
 
@@ -150,17 +159,17 @@ defmodule Talib.Utility do
   ## Examples
 
       iex> Talib.Utility.loss([1, 2, -3])
-      {:ok, [nil, 0, 5]}
+      {:ok, [0, 0, 5]}
 
       iex> Talib.Utility.loss([1])
-      {:ok, [nil]}
+      {:ok, [0]}
 
       iex> Talib.Utility.loss([])
       {:error, :no_data}
 
   ## History
 
-  Version: 1.0  
+  Version: 1.0
   Audited by:
 
   | Name         | Title             |
@@ -195,7 +204,7 @@ defmodule Talib.Utility do
 
   ## History
 
-  Version: 1.0  
+  Version: 1.0
   Audited by:
 
   | Name         | Title             |
@@ -205,12 +214,15 @@ defmodule Talib.Utility do
   """
   @spec low([number]) :: {:ok, number} | {:error, atom}
   def low([]), do: {:error, :no_data}
+
   def low(data) do
     filtered_data = filter_nil(data)
-    lowest = case filtered_data do
-      [] -> nil
-      [_ | _] -> Enum.min(filtered_data)
-    end
+
+    lowest =
+      case filtered_data do
+        [] -> nil
+        [_ | _] -> Enum.min(filtered_data)
+      end
 
     {:ok, lowest}
   end
@@ -237,7 +249,7 @@ defmodule Talib.Utility do
 
   ## History
 
-  Version: 1.0  
+  Version: 1.0
   Audited by:
 
   | Name         | Title             |
@@ -247,10 +259,12 @@ defmodule Talib.Utility do
   """
   @spec occur([number]) :: {:ok, map} | {:error, atom}
   def occur([]), do: {:error, :no_data}
+
   def occur(data) do
-    result = Enum.reduce(data, %{}, fn(tag, acc) ->
-      Map.update(acc, tag, 1, &(&1 + 1))
-    end)
+    result =
+      Enum.reduce(data, %{}, fn tag, acc ->
+        Map.update(acc, tag, 1, &(&1 + 1))
+      end)
 
     {:ok, result}
   end
@@ -269,26 +283,26 @@ defmodule Talib.Utility do
   ## Examples
 
       iex> Talib.Utility.change!([1, 2, -3])
-      [nil, 1, -5]
+      [0, 1, -5]
 
       iex> Talib.Utility.change!([1, 2, -3], 1)
-      [nil, 1, 0]
+      [0, 1, 0]
 
       iex> Talib.Utility.change!([1, 2, nil, -3], 0)
-      [nil, 1, nil, nil]
+      [0, 1, 0, 0]
 
       iex> Talib.Utility.change!([1, 2, -3], -1)
-      [nil, 0, 5]
+      [0, 0, 5]
 
       iex> Talib.Utility.change!([1], -1)
-      [nil]
+      [0]
 
       iex> Talib.Utility.change!([], -1)
       ** (NoDataError) no data error
 
   ## History
 
-  Version: 1.0  
+  Version: 1.0
   Audited by:
 
   | Name         | Title             |
@@ -310,17 +324,17 @@ defmodule Talib.Utility do
   ## Examples
 
       iex> Talib.Utility.gain!([1, 2, -3])
-      [nil, 1, 0]
+      [0, 1, 0]
 
       iex> Talib.Utility.gain!([1])
-      [nil]
+      [0]
 
       iex> Talib.Utility.gain!([])
       ** (NoDataError) no data error
 
   ## History
 
-  Version: 1.0  
+  Version: 1.0
   Audited by:
 
   | Name         | Title             |
@@ -355,7 +369,7 @@ defmodule Talib.Utility do
 
   ## History
 
-  Version: 1.0  
+  Version: 1.0
   Audited by:
 
   | Name         | Title             |
@@ -376,17 +390,17 @@ defmodule Talib.Utility do
   ## Examples
 
       iex> Talib.Utility.loss!([1, 2, -3])
-      [nil, 0, 5]
+      [0, 0, 5]
 
       iex> Talib.Utility.loss!([1])
-      [nil]
+      [0]
 
       iex> Talib.Utility.loss!([])
       ** (NoDataError) no data error
 
   ## History
 
-  Version: 1.0  
+  Version: 1.0
   Audited by:
 
   | Name         | Title             |
@@ -421,7 +435,7 @@ defmodule Talib.Utility do
 
   ## History
 
-  Version: 1.0  
+  Version: 1.0
   Audited by:
 
   | Name         | Title             |
@@ -454,7 +468,7 @@ defmodule Talib.Utility do
 
   ## History
 
-  Version: 1.0  
+  Version: 1.0
   Audited by:
 
   | Name         | Title             |
@@ -477,7 +491,6 @@ defmodule Talib.Utility do
   @spec filter_nil([number | nil]) :: [number]
   def filter_nil(data), do: Enum.filter(data, &(&1 !== nil))
 
-
   @doc """
   Transforms an input function to a bang function, which either returns the
   output value or raises errors.
@@ -496,6 +509,7 @@ defmodule Talib.Utility do
   """
   @spec to_bang_function({atom, any | atom}) :: any | no_return
   def to_bang_function({:ok, result}), do: result
+
   def to_bang_function({:error, error}) do
     case error do
       :bad_period -> raise BadPeriodError

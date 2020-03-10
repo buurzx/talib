@@ -7,8 +7,8 @@ defmodule Talib.MACD do
 
   ## History
 
-  Version: 1.0  
-  Source: http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_average_convergence_divergence_macd  
+  Version: 1.0
+  Source: http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_average_convergence_divergence_macd
   Audited by:
 
   | Name         | Title             |
@@ -26,17 +26,15 @@ defmodule Talib.MACD do
   * :values - List of values resulting from the calculation
   """
   @type t :: %Talib.MACD{
-    long_period: integer,
-    short_period: integer,
-    signal_period: integer,
-    values: [number]
-  }
-  defstruct [
-    long_period: 0,
-    short_period: 0,
-    signal_period: 0,
-    values: []
-  ]
+          long_period: integer,
+          short_period: integer,
+          signal_period: integer,
+          values: [number]
+        }
+  defstruct long_period: 0,
+            short_period: 0,
+            signal_period: 0,
+            values: []
 
   @doc """
   Gets the MACD of a list.
@@ -61,8 +59,9 @@ defmodule Talib.MACD do
       iex>Talib.MACD.from_list([], 26, 12, 9)
       {:error, :no_data}
   """
-  @spec from_list([number], integer, integer, integer) :: {:ok, Talib.MACD.t}
-  | {:error, atom}
+  @spec from_list([number], integer, integer, integer) ::
+          {:ok, Talib.MACD.t()}
+          | {:error, atom}
   def from_list(data, long \\ 26, short \\ 12, signal \\ 9),
     do: calculate(data, long, short, signal)
 
@@ -89,8 +88,9 @@ defmodule Talib.MACD do
       iex>Talib.MACD.from_list!([], 26, 12, 9)
       ** (NoDataError) no data error
   """
-  @spec from_list!([number], integer, integer, integer) :: Talib.MACD.t
-  | no_return
+  @spec from_list!([number], integer, integer, integer) ::
+          Talib.MACD.t()
+          | no_return
   def from_list!(data, long \\ 26, short \\ 12, signal \\ 9) do
     case calculate(data, long, short, signal) do
       {:ok, result} -> result
@@ -99,27 +99,30 @@ defmodule Talib.MACD do
   end
 
   @doc false
-  @spec calculate([number], integer, integer, integer) :: {:ok, Talib.MACD.t}
-  | {:error, atom}
+  @spec calculate([number], integer, integer, integer) ::
+          {:ok, Talib.MACD.t()}
+          | {:error, atom}
   defp calculate(data, long_period, short_period, signal_period) do
-    OK.with do
+    OK.try do
       %EMA{values: long_ema} <- EMA.from_list(data, long_period)
       %EMA{values: short_ema} <- EMA.from_list(data, short_period)
       %EMA{values: signal_ema} <- EMA.from_list(data, signal_period)
 
       short_long_ema = Enum.zip([long_ema, short_ema, signal_ema])
 
-      result = for {long, short, signal} <- short_long_ema do
-        {short - long, signal}
-      end
-
-      {:ok, %Talib.MACD{
-        long_period: long_period,
-        short_period: short_period,
-        signal_period: signal_period,
-        values: result
-      }}
-    else
+      result =
+        for {long, short, signal} <- short_long_ema do
+          {short - long, signal}
+        end
+    after
+      {:ok,
+       %Talib.MACD{
+         long_period: long_period,
+         short_period: short_period,
+         signal_period: signal_period,
+         values: result
+       }}
+    rescue
       :no_data -> {:error, :no_data}
     end
   end

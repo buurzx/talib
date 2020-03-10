@@ -4,13 +4,13 @@ defmodule Talib.Mixfile do
   def project do
     [
       app: :talib,
-      version: "0.1.0",
+      version: "0.1.1",
       elixir: "~> 1.10",
       description: "An Elixir Technical Analysis library.",
       package: [
-        maintainers: ["Wouter Klijn"],
+        maintainers: ["Wouter Klijn", "Pavel Ro"],
         licenses: ["MIT"],
-        links: %{"GitHub" => "https://github.com/wuhkuh/talib"}
+        links: %{"GitHub" => "https://github.com/buurzx/talib"}
       ],
       aliases: [
         "test.all": ["test.types", "test"],

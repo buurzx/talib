@@ -5,7 +5,7 @@ defmodule Talib.Mixfile do
     [
       app: :talib,
       version: "0.1.1",
-      elixir: "~> 1.10",
+      elixir: "~> 1.9.4",
       description: "An Elixir Technical Analysis library.",
       package: [
         maintainers: ["Wouter Klijn", "Pavel Ro"],

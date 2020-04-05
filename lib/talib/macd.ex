@@ -112,7 +112,6 @@ defmodule Talib.MACD do
           short - long
         end
 
-      IO.inspect(macd_data, label: "macd_data")
       %EMA{values: signal_ema} <- EMA.from_list(macd_data, signal_period)
 
       # %EMA{values: signal_ema} <- EMA.from_list(data, signal_period)

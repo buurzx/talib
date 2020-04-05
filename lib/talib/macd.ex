@@ -106,13 +106,22 @@ defmodule Talib.MACD do
     OK.try do
       %EMA{values: long_ema} <- EMA.from_list(data, long_period)
       %EMA{values: short_ema} <- EMA.from_list(data, short_period)
-      %EMA{values: signal_ema} <- EMA.from_list(data, signal_period)
 
-      short_long_ema = Enum.zip([long_ema, short_ema, signal_ema])
+      macd_data =
+        for {long, short} <- Enum.zip([long_ema, short_ema]) do
+          short - long
+        end
+
+      IO.inspect(macd_data, label: "macd_data")
+      %EMA{values: signal_ema} <- EMA.from_list(macd_data, signal_period)
+
+      # %EMA{values: signal_ema} <- EMA.from_list(data, signal_period)
+
+      macd_signal = Enum.zip([macd_data, signal_ema])
 
       result =
-        for {long, short, signal} <- short_long_ema do
-          {short - long, signal}
+        for {macd, signal} <- macd_signal do
+          {macd - signal, macd, signal}
         end
     after
       {:ok,

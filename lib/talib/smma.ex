@@ -82,7 +82,7 @@ defmodule Talib.SMMA do
           {:ok, Talib.SMMA.t()}
           | {:error, atom}
   defp calculate(data, period, results \\ [])
-  defp calculate(data, 0, _results), do: {:error, :bad_period}
+  defp calculate(_data, 0, _results), do: {:error, :bad_period}
 
   defp calculate(data, period, []) do
     {hd, tl} = Enum.split(data, period)

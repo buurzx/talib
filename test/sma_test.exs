@@ -41,6 +41,7 @@ defmodule Talib.SMATest do
         0,
         0,
         0,
+        0,
         54.1,
         49.8,
         45.1,
@@ -53,6 +54,31 @@ defmodule Talib.SMATest do
         53.0,
         56.6
       ]
+    end
+
+    def numbers_14 do
+      [
+        44.34,
+        44.09,
+        44.15,
+        43.61,
+        44.33,
+        44.83,
+        45.10,
+        45.42,
+        45.84,
+        46.08,
+        45.89,
+        46.03,
+        45.61,
+        46.28,
+        46.28,
+        46.00
+      ]
+    end
+
+    def gains_sma_14 do
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.24, 0.22]
     end
   end
 
@@ -68,7 +94,7 @@ defmodule Talib.SMATest do
              {:ok,
               %Talib.SMA{
                 period: 2,
-                values: [0, 0, 82.0]
+                values: [0, 0, 0, 82.0]
               }}
 
     assert SMA.from_list([3], 3) ==
@@ -92,7 +118,7 @@ defmodule Talib.SMATest do
     assert SMA.from_list!([nil, 87, 77], 2) ==
              %Talib.SMA{
                period: 2,
-               values: [0, 0, 82.0]
+               values: [0, 0, 0, 82.0]
              }
 
     assert SMA.from_list!([3], 3) ==
@@ -103,5 +129,16 @@ defmodule Talib.SMATest do
 
     assert_raise NoDataError, fn -> SMA.from_list!([], 1) end
     assert_raise BadPeriodError, fn -> SMA.from_list!([3], 0) end
+  end
+
+  test "for rsi" do
+    gains = Fixtures.numbers_14() |> Talib.Utility.gain!()
+    losses = Fixtures.numbers_14() |> Talib.Utility.loss!()
+
+    assert SMA.from_list!(gains, 14) ==
+             %Talib.SMA{
+               period: 14,
+               values: Fixtures.gains_sma_14()
+             }
   end
 end

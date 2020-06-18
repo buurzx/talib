@@ -34,7 +34,7 @@ defmodule Talib.SMA do
       iex> Talib.SMA.from_list([17, 23, 44], 2)
       {:ok, %Talib.SMA{
         period: 2,
-        values: [0, 20.0, 33.5]
+        values: [0, 0, 20.0, 33.5]
       }}
 
       iex> Talib.SMA.from_list([], 1)
@@ -57,7 +57,7 @@ defmodule Talib.SMA do
       iex> Talib.SMA.from_list!([9, 10, 11, 12, 13, 14], 5)
       %Talib.SMA{
         period: 5,
-        values: [0, 0, 0, 0, 11.0, 12.0]
+        values: [0, 0, 0, 0, 0, 11.0, 12.0]
       }
 
       iex> Talib.SMA.from_list!([], 1)
@@ -92,7 +92,8 @@ defmodule Talib.SMA do
 
   defp calculate([hd | tl] = data, period, results) do
     cond do
-      length(results) < period - 1 && length(data) > length(results) ->
+      # 0 - 14
+      length(results) <= period && length(data) > length(results) ->
         calculate(data, period, results ++ [0])
 
       length(data) < period ->
@@ -101,7 +102,7 @@ defmodule Talib.SMA do
       hd === nil ->
         calculate(tl, period, results ++ [0])
 
-      length(data) >= period ->
+      length(data) > period ->
         result =
           data
           |> Enum.take(period)
@@ -109,6 +110,12 @@ defmodule Talib.SMA do
           |> Kernel./(period)
 
         calculate(tl, period, results ++ [Float.round(result, 2)])
+
+      true ->
+        IO.inspect(length(data), label: "length(data)")
+        IO.inspect(length(results), label: "length(results)")
+        IO.inspect(results, label: "(results)")
+        {:ok, %Talib.SMA{period: period, values: results}}
     end
   end
 end

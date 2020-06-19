@@ -105,7 +105,7 @@ defmodule Talib.RSI do
               _ -> average_gain / average_loss
             end
 
-          (100 - 100 / (relative_strength + 1)) |> Float.round(2)
+          (100 - 100 / (relative_strength + 1)) |> Float.round(4)
         end
 
       {:ok,

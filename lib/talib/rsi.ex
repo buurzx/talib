@@ -93,9 +93,6 @@ defmodule Talib.RSI do
       %SMA{values: avg_gain} = SMA.from_list!(Utility.gain!(data), period)
       %SMA{values: avg_loss} = SMA.from_list!(Utility.loss!(data), period)
 
-      gains = Utility.gain!(data)
-      losses = Utility.loss!(data)
-
       avg_gain_loss = Enum.zip(avg_gain, avg_loss)
 
       result =
@@ -108,7 +105,7 @@ defmodule Talib.RSI do
               _ -> average_gain / average_loss
             end
 
-          (100 - 100 / (relative_strength + 1)) |> Float.round(2)
+          (100 - 100 / (Float.round(relative_strength, 4) + 1)) |> Float.round(2)
         end
 
       {:ok,

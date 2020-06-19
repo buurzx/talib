@@ -34,7 +34,7 @@ defmodule Talib.SMA do
       iex> Talib.SMA.from_list([17, 23, 44], 2)
       {:ok, %Talib.SMA{
         period: 2,
-        values: [0, 20.0, 33.5]
+        values: [0, 0, 20.0, 33.5]
       }}
 
       iex> Talib.SMA.from_list([], 1)
@@ -57,7 +57,7 @@ defmodule Talib.SMA do
       iex> Talib.SMA.from_list!([9, 10, 11, 12, 13, 14], 5)
       %Talib.SMA{
         period: 5,
-        values: [0, 0, 0, 0, 11.0, 12.0]
+        values: [0, 0, 0, 0, 0, 11.0, 12.0]
       }
 
       iex> Talib.SMA.from_list!([], 1)
@@ -76,31 +76,44 @@ defmodule Talib.SMA do
   end
 
   @doc false
-  @spec calculate([number], integer, [float]) ::
+  @spec calculate([number], integer, [float], integer) ::
           {:ok, Talib.SMA.t()}
           | {:error, atom}
-  defp calculate(data, period, results \\ [])
+  defp calculate(data, period, results \\ [], index \\ 0)
 
-  defp calculate([], _period, []),
+  defp calculate([], _period, [], 0),
     do: {:error, :no_data}
 
-  defp calculate(_data, 0, _results),
+  defp calculate(_data, 0, _results, 0),
     do: {:error, :bad_period}
 
-  defp calculate([], period, results),
+  defp calculate([], period, results, _),
     do: {:ok, %Talib.SMA{period: period, values: results}}
 
-  defp calculate([hd | tl] = data, period, results) do
+  defp calculate([hd | tl] = data, period, results, index) do
     cond do
-      length(results) < period - 1 && length(data) > length(results) ->
-        calculate(data, period, results ++ [0])
+      # period = 14
+      # if results size < 14 && 15 > 14
+      # add [0] to results
+      length(results) < period && length(data) > length(results) ->
+        index = index + 1
+        calculate(data, period, results ++ [0], index)
 
-      length(data) < period ->
-        calculate(tl, period, results)
+      # if data size < 14
+      length(data) <= period ->
+        calculate(tl, period, results, index)
 
+      # for any nil cases, suddenly
       hd === nil ->
-        calculate(tl, period, results ++ [0])
+        calculate(tl, period, results ++ [0], index)
 
+      # after first average counted
+      # calculate rest of data
+      length(results) >= period + 1 ->
+        next_avg = (List.last(Enum.take(results, -1)) * 13 + Enum.at(data, index)) / period
+        calculate(tl, period, results ++ [Float.round(next_avg, 6)], index)
+
+      # after period calculate first average
       length(data) >= period ->
         result =
           data
@@ -108,7 +121,7 @@ defmodule Talib.SMA do
           |> Enum.sum()
           |> Kernel./(period)
 
-        calculate(tl, period, results ++ [Float.round(result, 2)])
+        calculate(tl, period, results ++ [Float.round(result, 6)], index)
     end
   end
 end

@@ -1,5 +1,5 @@
 defmodule Talib.RSI do
-  alias Talib.SMMA
+  alias Talib.SMA
   alias Talib.Utility
 
   @moduledoc ~S"""
@@ -90,8 +90,8 @@ defmodule Talib.RSI do
           | {:error, atom}
   defp calculate(data, period) do
     try do
-      %SMMA{values: avg_gain} = SMMA.from_list!(Utility.gain!(data), period)
-      %SMMA{values: avg_loss} = SMMA.from_list!(Utility.loss!(data), period)
+      %SMA{values: avg_gain} = SMA.from_list!(Utility.gain!(data), period)
+      %SMA{values: avg_loss} = SMA.from_list!(Utility.loss!(data), period)
 
       avg_gain_loss = Enum.zip(avg_gain, avg_loss)
 
@@ -105,7 +105,7 @@ defmodule Talib.RSI do
               _ -> average_gain / average_loss
             end
 
-          (100 - 100 / (relative_strength + 1)) |> Float.round(2)
+          (100 - 100 / (Float.round(relative_strength, 4) + 1)) |> Float.round(2)
         end
 
       {:ok,

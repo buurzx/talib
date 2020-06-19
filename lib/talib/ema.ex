@@ -4,8 +4,8 @@ defmodule Talib.EMA do
 
   ## History
 
-  Version: 1.0  
-  Source: http://www.itl.nist.gov/div898/handbook/pmc/section3/pmc324.htm  
+  Version: 1.0
+  Source: http://www.itl.nist.gov/div898/handbook/pmc/section3/pmc324.htm
   Audited by:
 
   | Name         | Title             |
@@ -21,10 +21,8 @@ defmodule Talib.EMA do
   * :values - List of values resulting from the calculation
   """
   @type t :: %Talib.EMA{period: integer, values: [float]}
-  defstruct [
-    period: 0,
-    values: []
-  ]
+  defstruct period: 0,
+            values: []
 
   @doc """
   Gets the EMA of a list.
@@ -43,7 +41,7 @@ defmodule Talib.EMA do
       iex>Talib.EMA.from_list([], 2)
       {:error, :no_data}
   """
-  @spec from_list([number], integer) :: {:ok, Talib.EMA.t} | {:error, atom}
+  @spec from_list([number], integer) :: {:ok, Talib.EMA.t()} | {:error, atom}
   def from_list(data, period), do: calculate(data, period)
 
   @doc """
@@ -63,7 +61,7 @@ defmodule Talib.EMA do
       iex>Talib.EMA.from_list!([], 2)
       ** (NoDataError) no data error
   """
-  @spec from_list!([number], integer) :: Talib.EMA.t | no_return
+  @spec from_list!([number], integer) :: Talib.EMA.t() | no_return
   def from_list!(data, period) do
     case calculate(data, period) do
       {:ok, result} -> result
@@ -72,15 +70,20 @@ defmodule Talib.EMA do
   end
 
   @doc false
-  @spec calculate([number], integer, [float]) :: {:ok, Talib.EMA.t}
-  | {:error, atom}
+  @spec calculate([number], integer, [float]) ::
+          {:ok, Talib.EMA.t()}
+          | {:error, atom}
   defp calculate(data, period, results \\ [])
+
   defp calculate([], _period, []),
     do: {:error, :no_data}
+
   defp calculate([], period, results),
     do: {:ok, %Talib.EMA{period: period, values: results}}
+
   defp calculate([hd | tl], period, []),
     do: calculate(tl, period, [hd / 1])
+
   defp calculate([hd | tl], period, results) do
     [previous_average] = Enum.take(results, -1)
     new_weight = 2 / (period + 1)

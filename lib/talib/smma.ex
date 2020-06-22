@@ -103,6 +103,6 @@ defmodule Talib.SMMA do
     [previous_average] = Enum.take(results, -1)
     result = ((previous_average || 0.0) * (period - 1) + hd) / period
 
-    calculate(tl, period, results ++ [Float.round(result, 2)])
+    calculate(tl, period, results ++ [Float.round(result, 6)])
   end
 end

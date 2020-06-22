@@ -138,6 +138,83 @@ defmodule Talib.SMMATest do
         0.42
       ]
     end
+
+    def gain_numbers_14 do
+      # 16
+      [
+        0,
+        0,
+        0.0595,
+        0,
+        0.7154,
+        0.4986,
+        0.2691,
+        0.3290,
+        0.4188,
+        0.2393,
+        0,
+        0.1397,
+        0,
+        0.6680,
+        0,
+        0,
+        0.0300,
+        0.3788,
+        0.0000,
+        0.0000,
+        0.5683,
+        0.0399,
+        0.0000,
+        0.7378,
+        0.0000,
+        0.0000,
+        0.0000,
+        0.1495,
+        0.0398,
+        0.3491,
+        0.0000,
+        0.0000,
+        0.4686
+      ]
+    end
+
+    def gains_sma_14 do
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0.238386,
+        0.221358,
+        0.20769,
+        0.219912,
+        0.204204,
+        0.189618,
+        0.216667,
+        0.204041,
+        0.189467,
+        0.228634,
+        0.212303,
+        0.197138,
+        0.183057,
+        0.18066,
+        0.170599,
+        0.183349,
+        0.170253,
+        0.158092,
+        0.180271
+      ]
+    end
   end
 
   test "from_list/2" do
@@ -178,5 +255,13 @@ defmodule Talib.SMMATest do
 
   test "from_list!/2 period 14" do
     assert SMMA.from_list!(Fixtures.numbers_14(), 14).values == Fixtures.numbers_smma_14()
+  end
+
+  test "for rsi" do
+    assert SMMA.from_list!(Fixtures.gain_numbers_14(), 14) ==
+             %Talib.SMMA{
+               period: 14,
+               values: Fixtures.gains_sma_14()
+             }
   end
 end

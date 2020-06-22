@@ -34,7 +34,7 @@ defmodule Talib.SMA do
       iex> Talib.SMA.from_list([17, 23, 44], 2)
       {:ok, %Talib.SMA{
         period: 2,
-        values: [0, 0, 20.0, 33.5]
+        values: [0, 20.0, 33.5]
       }}
 
       iex> Talib.SMA.from_list([], 1)
@@ -57,7 +57,7 @@ defmodule Talib.SMA do
       iex> Talib.SMA.from_list!([9, 10, 11, 12, 13, 14], 5)
       %Talib.SMA{
         period: 5,
-        values: [0, 0, 0, 0, 0, 11.0, 12.0]
+        values: [0, 0, 0, 0, 11.0, 12.0]
       }
 
       iex> Talib.SMA.from_list!([], 1)
@@ -90,51 +90,25 @@ defmodule Talib.SMA do
   defp calculate([], period, results),
     do: {:ok, %Talib.SMA{period: period, values: results}}
 
-  defp calculate([hd | _tl] = data, period, results) do
+  defp calculate([hd | tl] = data, period, results) do
     cond do
-      # period = 14
-      # if results size < 14 && 15 > 14
-      # add [0] to results
       length(results) < period && length(data) > length(results) ->
         calculate(data, period, results ++ [0])
 
-      # if data size < 14
-      length(data) <= period ->
-        calculate(data, period, results)
+      length(data) < period ->
+        calculate(tl, period, results)
 
-      # for any nil cases, suddenly
       hd === nil ->
-        calculate(data, period, results ++ [0])
+        calculate(tl, period, results ++ [0])
 
-      # after first average counted
-      # calculate rest of data
-      length(results) >= period + 1 && length(data) > length(results) ->
-        # IO.inspect(data, label: "data")
-        # IO.inspect(results, label: "results")
-        # IO.inspect(Enum.take(results, -1), label: "prev price")
-
-        # IO.inspect(length(data), label: "length(data)")
-
-        # IO.inspect(Enum.at(data, length(results)), label: "current price")
-        # IO.puts("======================")
-
-        next_avg =
-          (List.last(Enum.take(results, -1)) * 13 + Enum.at(data, length(results))) / period
-
-        calculate(data, period, results ++ [Float.round(next_avg, 6)])
-
-      # after period calculate first average
-      length(data) >= period && length(data) > length(results) ->
+      length(data) >= period ->
         result =
           data
           |> Enum.take(period)
           |> Enum.sum()
           |> Kernel./(period)
 
-        calculate(data, period, results ++ [Float.round(result, 6)])
-
-      length(data) === length(results) ->
-        calculate([], period, results)
+        calculate(tl, period, results ++ [Float.round(result, 6)])
     end
   end
 end

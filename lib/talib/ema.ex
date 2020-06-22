@@ -81,12 +81,23 @@ defmodule Talib.EMA do
   defp calculate([], period, results),
     do: {:ok, %Talib.EMA{period: period, values: results}}
 
-  defp calculate([hd | tl], period, []),
-    do: calculate(tl, period, [hd / 1])
+  # defp calculate([hd | tl], period, []),
+  #   do: calculate(tl, period, List.duplicate(0.0, period - 1) ++ [hd])
 
+  # For the first EMA, we use the SMA
+  defp calculate(data, period, []) do
+    {sma_data, tl} = Enum.split(data, period)
+    first_average = Enum.sum(sma_data) / period
+    calculate(tl, period, List.duplicate(0.0, period - 1) ++ [first_average])
+  end
+
+  # EMA = {Close - EMA(previous day)} x multiplier + EMA(previous day)
   defp calculate([hd | tl], period, results) do
     [previous_average] = Enum.take(results, -1)
     new_weight = 2 / (period + 1)
+
+    # new_average = (hd - previous_average) * new_weight + previous_average
+
     new_average = hd * new_weight + previous_average * (1 - new_weight)
 
     calculate(tl, period, results ++ [new_average])

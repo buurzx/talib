@@ -35,7 +35,12 @@ defmodule Talib.Average do
   """
   @spec mean([number]) :: {:ok, number} | {:error, atom}
   def mean([]), do: {:error, :no_data}
-  def mean(data), do: {:ok, Enum.sum(data) / length(data)}
+  # def mean(data), do: {:ok, Enum.sum(data) / length(data)}
+  def mean(data) do
+    {:ok,
+     Enum.filter(data, &Kernel.!=(&1, nil))
+     |> (fn x -> Enum.sum(x) / Enum.count(x) end).()}
+  end
 
   @doc """
   Gets the median of a list.
@@ -197,7 +202,11 @@ defmodule Talib.Average do
   """
   @spec mean!([number]) :: number | no_return
   def mean!([]), do: raise(NoDataError)
-  def mean!(data), do: Enum.sum(data) / length(data)
+  # def mean!(data), do: Enum.sum(data) / length(data)
+  def mean!(data) do
+    Enum.filter(data, &Kernel.!=(&1, nil))
+    |> (fn x -> Enum.sum(x) / Enum.count(x) end).()
+  end
 
   @doc """
   Gets the median of a list.

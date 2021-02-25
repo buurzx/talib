@@ -24,8 +24,8 @@ defmodule Talib.Average do
 
   ## History
 
-  Version: 1.0  
-  Source: http://mathworld.wolfram.com/ArithmeticMean.html  
+  Version: 1.0
+  Source: http://mathworld.wolfram.com/ArithmeticMean.html
   Audited by:
 
   | Name         | Title             |
@@ -58,8 +58,8 @@ defmodule Talib.Average do
 
   ## History
 
-  Version: 1.0  
-  Source: http://mathworld.wolfram.com/StatisticalMedian.html  
+  Version: 1.0
+  Source: http://mathworld.wolfram.com/StatisticalMedian.html
   Audited by:
 
   | Name         | Title             |
@@ -69,16 +69,19 @@ defmodule Talib.Average do
   """
   @spec median([number]) :: {:ok, number} | {:error, atom}
   def median([]), do: {:error, :no_data}
+
   def median(data) do
-    midpoint = data
-    |> length
-    |> Integer.floor_div(2)
+    midpoint =
+      data
+      |> length
+      |> Integer.floor_div(2)
 
     # 0 is even, 1 is odd
     case data |> length |> rem(2) do
       0 ->
         {_, [med1, med2 | _]} = Enum.split(data, midpoint - 1)
         {:ok, (med1 + med2) / 2}
+
       1 ->
         {_, [median | _]} = Enum.split(data, midpoint)
         {:ok, median / 1}
@@ -106,8 +109,8 @@ defmodule Talib.Average do
 
   ## History
 
-  Version: 1.0  
-  Source: http://mathworld.wolfram.com/Midrange.html  
+  Version: 1.0
+  Source: http://mathworld.wolfram.com/Midrange.html
   Audited by:
 
   | Name         | Title             |
@@ -117,9 +120,10 @@ defmodule Talib.Average do
   """
   @spec midrange([number]) :: {:ok, number} | {:error, atom}
   def midrange([]), do: {:error, :no_data}
+
   def midrange(data) do
-    max = data |> Enum.max
-    min = data |> Enum.min
+    max = data |> Enum.max()
+    min = data |> Enum.min()
 
     {:ok, (max + min) / 2}
   end
@@ -145,8 +149,8 @@ defmodule Talib.Average do
 
   ## History
 
-  Version: 1.0  
-  Source: http://mathworld.wolfram.com/Mode.html  
+  Version: 1.0
+  Source: http://mathworld.wolfram.com/Mode.html
   Audited by:
 
   | Name         | Title             |
@@ -156,6 +160,7 @@ defmodule Talib.Average do
   """
   @spec mode([number]) :: {:ok, [number, ...] | number} | {:error, atom}
   def mode([]), do: {:error, :no_data}
+
   def mode(data) do
     case Utility.occur(data) do
       {:ok, occur} -> {:ok, map_max(occur)}
@@ -181,8 +186,8 @@ defmodule Talib.Average do
 
   ## History
 
-  Version: 1.0  
-  Source: http://mathworld.wolfram.com/ArithmeticMean.html  
+  Version: 1.0
+  Source: http://mathworld.wolfram.com/ArithmeticMean.html
   Audited by:
 
   | Name         | Title             |
@@ -191,7 +196,7 @@ defmodule Talib.Average do
 
   """
   @spec mean!([number]) :: number | no_return
-  def mean!([]), do: raise NoDataError
+  def mean!([]), do: raise(NoDataError)
   def mean!(data), do: Enum.sum(data) / length(data)
 
   @doc """
@@ -215,8 +220,8 @@ defmodule Talib.Average do
 
   ## History
 
-  Version: 1.0  
-  Source: http://mathworld.wolfram.com/StatisticalMedian.html  
+  Version: 1.0
+  Source: http://mathworld.wolfram.com/StatisticalMedian.html
   Audited by:
 
   | Name         | Title             |
@@ -225,17 +230,20 @@ defmodule Talib.Average do
 
   """
   @spec median!([number]) :: number | no_return
-  def median!([]), do: raise NoDataError
+  def median!([]), do: raise(NoDataError)
+
   def median!(data) do
-    midpoint = data
-    |> length
-    |> Integer.floor_div(2)
+    midpoint =
+      data
+      |> length
+      |> Integer.floor_div(2)
 
     # 0 is even, 1 is odd
     case data |> length |> rem(2) do
       0 ->
         {_, [med1, med2 | _]} = Enum.split(data, midpoint - 1)
         (med1 + med2) / 2
+
       1 ->
         {_, [median | _]} = Enum.split(data, midpoint)
         median / 1
@@ -263,8 +271,8 @@ defmodule Talib.Average do
 
   ## History
 
-  Version: 1.0  
-  Source: http://mathworld.wolfram.com/Midrange.html  
+  Version: 1.0
+  Source: http://mathworld.wolfram.com/Midrange.html
   Audited by:
 
   | Name         | Title             |
@@ -273,10 +281,11 @@ defmodule Talib.Average do
 
   """
   @spec midrange!([number]) :: number | no_return
-  def midrange!([]), do: raise NoDataError
+  def midrange!([]), do: raise(NoDataError)
+
   def midrange!(data) do
-    max = data |> Enum.max
-    min = data |> Enum.min
+    max = data |> Enum.max()
+    min = data |> Enum.min()
 
     (max + min) / 2
   end
@@ -302,8 +311,8 @@ defmodule Talib.Average do
 
   ## History
 
-  Version: 1.0  
-  Source: http://mathworld.wolfram.com/Mode.html  
+  Version: 1.0
+  Source: http://mathworld.wolfram.com/Mode.html
   Audited by:
 
   | Name         | Title             |
@@ -312,28 +321,62 @@ defmodule Talib.Average do
 
   """
   @spec mode!([number]) :: [number, ...] | number | no_return
-  def mode!([]), do: raise NoDataError
+  def mode!([]), do: raise(NoDataError)
+
   def mode!(data) do
     data
-    |> Utility.occur!
+    |> Utility.occur!()
     |> map_max
+  end
+
+  @doc false
+  @spec deviation!([number]) :: [number, ...] | number | no_return
+  def deviation!([]), do: raise(NoDataError)
+
+  def deviation!(data) do
+    m =
+      data
+      |> mean!
+
+    deviation_reduce(data, m)
+  end
+
+  defp deviation_reduce(data, m) do
+    data
+    |> Enum.filter(&Kernel.!=(&1, nil))
+    |> Enum.map(&:math.pow(&1 - m, 2))
+    |> (fn x -> Enum.sum(x) / Enum.count(x) end).()
+    |> :math.sqrt()
+  end
+
+  @doc false
+  @spec deviation([number]) :: [number, ...] | number | {:error, atom}
+  def deviation([]), do: {:error, :no_data}
+
+  def deviation(data) do
+    case data |> mean do
+      {:ok, m} -> deviation_reduce(data, m)
+      {:error, reason} -> {:error, reason}
+    end
   end
 
   @doc false
   @spec map_max(map()) :: number | [number, ...]
   defp map_max(map) do
-    max = map
-    |> Map.values
-    |> Enum.max
+    max =
+      map
+      |> Map.values()
+      |> Enum.max()
 
     # Create array of maximums
     # Add key to maximums array
-    maxes = Enum.reduce(map, [], fn({key, value}, acc) ->
-      case value do
-        ^max -> [key | acc]
-        _ -> acc
-      end
-    end)
+    maxes =
+      Enum.reduce(map, [], fn {key, value}, acc ->
+        case value do
+          ^max -> [key | acc]
+          _ -> acc
+        end
+      end)
 
     # Support multiple maximums %{a: 3, b: 3} => [:a, :b]
     # Or single maximum %{a: 3, b: 2} => [:a]
